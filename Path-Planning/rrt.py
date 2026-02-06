@@ -11,6 +11,7 @@ import math
 #2d RTT
 class RTT:
 
+    
     class Node:
 
         def __init__(self, x, y, parent=None):
@@ -28,9 +29,24 @@ class RTT:
 
         
     def find_nearest_node(self,x_new,y_new):
+        """
+        Finds the closest node based on euclidean distance to new point
+        Returns the Node.
+        
+        :param self: 
+        :param x_new: x coordinate of new point
+        :param y_new: y coordinate of new point
+        """
         return min(self.node_list, key=lambda n: (n.x - x_new)**2 + (n.y - y_new)**2)
 
     def calculate_new_node_location(self, near_node_location, random_pt):
+        """
+        Calculates the location of the new node based on how much distance to expand
+        Returns (x,y) tuple of new location
+        :param self: 
+        :param near_node_location: tuple of (x,y) coordinats of near vertice
+        :param random_pt: tuple of (x,y) coordinates of random pt
+        """
         x_near, y_near = near_node_location
         x_rand, y_rand = random_pt
 
@@ -49,9 +65,17 @@ class RTT:
         return (x_new, y_new)
     
     def is_node_collision_free(self, near_node_location, new_node_location):
+        """
+        Checks if there are any objects that intersect the line between near_node and new_node
+        return boolean
         
+        :param self: 
+        :param near_node_location: tuple of (x,y) coordinates of near node location
+        :param new_node_location: tuple of (x,y) coordinates of new node location
+        """
 
         def ccw(A, B, C):
+            
             # Returns True if points are in Counter-Clockwise order
             return (C[1] - A[1]) * (B[0] - A[0]) > (B[1] - A[1]) * (C[0] - A[0])
 
@@ -79,7 +103,7 @@ class RTT:
                 
         return True
 
-    
+    #implements RRT algo 
     def planning(self):
         start_node = RTT.Node(self.start[0], self.start[1])
         self.node_list.append(start_node)
@@ -105,14 +129,16 @@ class RTT:
                 self.node_list.append(new_node)
                 plt.plot(new_node.x,new_node.y, 'ko', markersize=1)
                 plt.plot((new_node.x, x_near), (new_node.y, y_near), 'k')
+                plt.pause(0.01)                
             else:
                 continue 
-
+            
             
         return
 
-    #find a path
+    #finds a path
     def find_path(self):
+
         closest_node = self.find_nearest_node(self.goal[0], self.goal[1])
         while(closest_node.parent != None):
             x_cords = (closest_node.x, closest_node.parent.x)

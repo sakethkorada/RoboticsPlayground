@@ -3,39 +3,30 @@ import matplotlib.pyplot as plt
 import matplotlib.colors as mcolors
 import random
 
-class Environment:
-    def __init__(self, width=100, height=100, is_discrete=False):
+class GridEnvironment:
+    def __init__(self, width=100, height=100, weighted=True):
         self.width = width
         self.height = height
         self.obstacles = [] # List of (x, y, w, h)
-        self.is_discrete = is_discrete
-        if(self.is_discrete):
-            self.map = np.ones((height, width))
-            self.weights = [3,5,10,15]
+    
+        self.map = np.ones((height, width))
+        self.weights = [3,5,10,15]
 
 
-    def add_random_obstacles(self, count=10):
-        if(self.is_discrete == False):
-            for _ in range(count):
-                w, h = random.randint(2, 5), random.randint(2, 5)
-                x = random.randint(0, self.width - w)
-                y = random.randint(0, self.height - h)
-                self.obstacles.append((x, y, w, h))
-        else:
-            
-            for _ in range(count * 2): 
-                cost = random.randint(2, 5) # Cost 2 to 5
-                w, h = random.randint(3, 8), random.randint(3, 8)
-                x = random.randint(0, self.width - w)
-                y = random.randint(0, self.height - h)
-                self.map[y:y+h, x:x+w] = cost 
+    def add_random_obstacles(self, count=10):  
+        for _ in range(count * 2): 
+            cost = random.randint(2, 5) # Cost 2 to 5
+            w, h = random.randint(3, 8), random.randint(3, 8)
+            x = random.randint(0, self.width - w)
+            y = random.randint(0, self.height - h)
+            self.map[y:y+h, x:x+w] = cost 
 
-        
-            for _ in range(count):
-                w, h = random.randint(2, 5), random.randint(2, 5)
-                x = random.randint(0, self.width - w)
-                y = random.randint(0, self.height - h)
-                self.map[y:y+h, x:x+w] = 0 # 0 means cant' pass
+    
+        for _ in range(count):
+            w, h = random.randint(2, 5), random.randint(2, 5)
+            x = random.randint(0, self.width - w)
+            y = random.randint(0, self.height - h)
+            self.map[y:y+h, x:x+w] = 0 # 0 means cant' pass
 
         
     def get_obstacles(self):
@@ -121,36 +112,31 @@ class Environment:
         plt.xlim(0, self.width)
         plt.ylim(0, self.height)
         plt.gca().set_aspect('equal', adjustable='box')
-        if self.is_discrete:
-            unique_costs = [0, 1] + sorted(self.weights) # e.g. [0, 1, 3, 5, 10, 15]
-            
-           
-            visual_map = np.searchsorted(unique_costs, self.map)
-            
-            
-            num_categories = len(unique_costs)
-            bounds = np.arange(num_categories + 1) # [0, 1, 2, 3, 4, 5, 6]
-            
-            #map colors
-            colors_list = ['black', "#09e52d", "#053e0e", "#EF70CB", "#adecf5d3", "#11d5efd4"]
-            cmap = mcolors.ListedColormap(colors_list)
-            norm = mcolors.BoundaryNorm(bounds, cmap.N)
+     
+        unique_costs = [0, 1] + sorted(self.weights) # e.g. [0, 1, 3, 5, 10, 15]
+        
+        
+        visual_map = np.searchsorted(unique_costs, self.map)
+        
+        
+        num_categories = len(unique_costs)
+        bounds = np.arange(num_categories + 1) # [0, 1, 2, 3, 4, 5, 6]
+        
+        #map colors
+        colors_list = ['black', "#09e52d", "#053e0e", "#EF70CB", "#adecf5d3", "#11d5efd4"]
+        cmap = mcolors.ListedColormap(colors_list)
+        norm = mcolors.BoundaryNorm(bounds, cmap.N)
 
-            #plot visual map
-            im = plt.imshow(visual_map, cmap=cmap, norm=norm, origin='lower', 
-                            extent=[0, self.width, 0, self.height])
-            
-            #center ticks
-            tick_locs = bounds[:-1] + 0.5
-            cbar = plt.colorbar(im, ticks=tick_locs)
-            
-            #original labels
-            labels = ['Obstacle'] + [f'Cost {c}' for c in unique_costs[1:]]
-            cbar.ax.set_yticklabels(labels)
-            
-        else:
-
-           
-            for (x, y, w, h) in self.obstacles:
-                rect = plt.Rectangle((x, y), w, h, color='green')
-                plt.gca().add_patch(rect)
+        #plot visual map
+        im = plt.imshow(visual_map, cmap=cmap, norm=norm, origin='lower', 
+                        extent=[0, self.width, 0, self.height])
+        
+        #center ticks
+        tick_locs = bounds[:-1] + 0.5
+        cbar = plt.colorbar(im, ticks=tick_locs)
+        
+        #original labels
+        labels = ['Obstacle'] + [f'Cost {c}' for c in unique_costs[1:]]
+        cbar.ax.set_yticklabels(labels)
+        
+       

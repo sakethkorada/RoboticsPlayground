@@ -169,23 +169,30 @@ class RRTStar:
                             new_lines = plt.plot([x_node, x_new], [y_node, y_new], 'k-', linewidth=0.5)
                             node.line_vis = new_lines[0] 
 
-                plt.pause(0.01)
+                plt.pause(0.001)
             else:
                 continue 
             
             continue
         return
     
-
+    def shortest_path(self):
+        closest_node = self.find_nearest_node(self.goalCoord[0], self.goalCoord[1])
+        while(closest_node.parent != None):
+            plt.plot([closest_node.x, closest_node.parent.x], [closest_node.y, closest_node.parent.y], 'b-', linewidth = 1)
+            plt.pause(0.45)
+            closest_node = closest_node.parent
+        return
 
 # Usage
 env = En()
-env.add_random_obstacles(30)
+env.add_random_obstacles(45)
 env.plot()
 
 obstacles = env.get_obstacles()
 
-rttstar = RRTStar( (30,30), (50,50), obstacles, expand_dist=4, interations=500)
+rttstar = RRTStar( (30,30), (50,50), obstacles, expand_dist=5, interations=2000)
 rttstar.planning()
+rttstar.shortest_path()
 
 plt.show()

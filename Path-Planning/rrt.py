@@ -145,6 +145,7 @@ class RTT:
             y_cords = (closest_node.y, closest_node.parent.y)
 
             plt.plot(x_cords, y_cords, 'b')
+            plt.pause(0.1)
             closest_node = closest_node.parent
 
         return
@@ -157,7 +158,7 @@ env.plot()
 obstacles = env.get_obstacles()
     
 
-rtt = RTT((30,30),(50,60), obstacles, expand_dist=4, iterations = 500)
+rtt = RTT((30,30),(50,60), obstacles, expand_dist=4, iterations = 100)
 rtt.planning()
 rtt.find_path()
 

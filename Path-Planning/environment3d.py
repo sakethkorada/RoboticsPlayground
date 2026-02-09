@@ -83,7 +83,13 @@ class Environment3D:
     def draw_line(self, point_a, point_b, color='blue', width=2):
         
         line = pv.Line(point_a, point_b)
-        self.plotter.add_mesh(line, color=color, line_width=width)
+        actor = self.plotter.add_mesh(line, color=color, line_width=width)
+        return actor
+
+    def remove_line(self, actor):
+        """Removes a specific line from the scene."""
+        if actor:
+            self.plotter.remove_actor(actor)
 
     def update_view(self):
         self.plotter.update()

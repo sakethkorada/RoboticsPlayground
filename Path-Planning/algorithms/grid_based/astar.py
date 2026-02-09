@@ -1,5 +1,5 @@
 import sys
-from gridenvironment import GridEnvironment
+from environments.grid_env import GridEnvironment
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches

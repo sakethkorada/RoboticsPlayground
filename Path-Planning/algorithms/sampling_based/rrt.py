@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import random
-from environment import Environment as En
+from environments.continuous_2d import Environment as En
 import math
 
 

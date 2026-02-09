@@ -1,6 +1,6 @@
 
 import random
-from environment3d import Environment3D
+from environments.continuous_3d import Environment3D
 import math
 
 

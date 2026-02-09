@@ -16,17 +16,23 @@ class RRTStar:
             self.line_vis = None
             
     
-    def __init__(self, startCoord, goalCoord, obstacles, expand_dist =5,interations=500):
+    def __init__(self, startCoord, goalCoord, obstacles, expand_dist =5,interations=500,stopEarly=False, radiusDetection=5):
         self.startCoord = startCoord
         self.goalCoord = goalCoord 
         self.obstacles = obstacles
         self.expand_dist = expand_dist
         self.iterations = interations
         self.node_list = []
+        self.stopEarly = stopEarly
+        self.radiusDetection = radiusDetection
 
 
     
-
+    def calculate_dist_between_nodes(self,node1_location, node2_location):
+        node1_x, node1_y = node1_location
+        node2_x, node2_y = node2_location
+        return math.sqrt((node1_x-node2_x)**2 + (node1_y-node2_y)**2)
+        
 
     def find_nearest_node(self,x_new,y_new):
         return min(self.node_list, key=lambda n: (n.x - x_new)**2 + (n.y - y_new)**2)
@@ -105,9 +111,12 @@ class RRTStar:
         start_node = RRTStar.Node(self.startCoord[0], self.startCoord[1])
         self.node_list.append(start_node)
 
-        
+        suptitle = f"RRTStar (iterations={self.iterations})"
+       
+        plt.suptitle(suptitle)
         plt.plot(start_node.x,start_node.y, 'bo')
         plt.plot(self.goalCoord[0], self.goalCoord[1], 'ro')
+        
 
 
         for _ in range(self.iterations):
@@ -124,6 +133,10 @@ class RRTStar:
             #else
             is_node_valid = self.is_node_collision_free((x_near,y_near), new_node_location)
             if is_node_valid:
+                
+
+
+
                 #find a subset of nodes that are close enough to new point
                 #find cheapest node
                 #check if rewiring vertices is cheaper
@@ -154,6 +167,8 @@ class RRTStar:
                 newNode.line_vis = lines[0]
                 self.node_list.append(newNode)
 
+                
+
                 for node in near_nodes:
                     #check if 
                     x_node, y_node = node.x, node.y
@@ -169,29 +184,32 @@ class RRTStar:
                             new_lines = plt.plot([x_node, x_new], [y_node, y_new], 'k-', linewidth=0.5)
                             node.line_vis = new_lines[0] 
 
+                if(self.stopEarly == True and self.calculate_dist_between_nodes(self.goalCoord,new_node_location) <= self.radiusDetection):
+                    break
+
+                plt.title(f"n={_}")
                 plt.pause(0.001)
-            else:
-                continue 
+                
             
-            continue
+            
         return
     
     def shortest_path(self):
         closest_node = self.find_nearest_node(self.goalCoord[0], self.goalCoord[1])
         while(closest_node.parent != None):
             plt.plot([closest_node.x, closest_node.parent.x], [closest_node.y, closest_node.parent.y], 'b-', linewidth = 1)
-            plt.pause(0.45)
+            plt.pause(0.2)
             closest_node = closest_node.parent
         return
 
 # Usage
-env = En()
+env = En(width=120, height=120)
 env.add_random_obstacles(45)
 env.plot()
 
 obstacles = env.get_obstacles()
 
-rttstar = RRTStar( (30,30), (50,50), obstacles, expand_dist=5, interations=2000)
+rttstar = RRTStar( (30,30), (50,50), obstacles, expand_dist=5, interations=2000,stopEarly=True, radiusDetection=3)
 rttstar.planning()
 rttstar.shortest_path()
 

@@ -19,14 +19,15 @@ class RTT:
             self.y = y
             self.parent = parent
     
-    def __init__(self, start, goal, obstacles, expand_dist = 2, iterations=1000):
+    def __init__(self, start, goal, obstacles, expand_dist = 2, iterations=1000, stop_early=False, radius_detection=1):
         self.start = start
         self.goal = goal
         self.obstacles = obstacles
         self.expand_dist = expand_dist
         self.iterations = iterations
         self.node_list = []
-
+        self.stop_early = stop_early
+        self.radius_detection = radius_detection
         
     def find_nearest_node(self,x_new,y_new):
         """
@@ -100,13 +101,22 @@ class RTT:
                 return False
             if(check_intersect(near_node_location, new_node_location, (x1,y1), (x1,y0))):
                 return False
-                
         return True
+    
+
+    def calculate_dist_between_nodes(self,node1_location, node2_location):
+        node1_x, node1_y = node1_location
+        node2_x, node2_y = node2_location
+        return math.sqrt((node1_x-node2_x)**2 + (node1_y-node2_y)**2)
+    
 
     #implements RRT algo 
     def planning(self):
         start_node = RTT.Node(self.start[0], self.start[1])
         self.node_list.append(start_node)
+        suptitle = f"RRT (iterations={self.iterations})"
+       
+        plt.suptitle(suptitle)
         plt.plot(start_node.x,start_node.y, 'bo')
         plt.plot(self.goal[0], self.goal[1], 'ro')
         for _ in range(self.iterations):
@@ -129,7 +139,10 @@ class RTT:
                 self.node_list.append(new_node)
                 plt.plot(new_node.x,new_node.y, 'ko', markersize=1)
                 plt.plot((new_node.x, x_near), (new_node.y, y_near), 'k')
-                plt.pause(0.01)                
+                plt.title(f"n={_}")
+                plt.pause(0.01)      
+                if(self.stop_early == True and self.calculate_dist_between_nodes(new_node_location, self.goal) <= self.radius_detection):
+                    break         
             else:
                 continue 
             
@@ -158,7 +171,7 @@ env.plot()
 obstacles = env.get_obstacles()
     
 
-rtt = RTT((30,30),(50,60), obstacles, expand_dist=4, iterations = 100)
+rtt = RTT((30,30),(50,60), obstacles, expand_dist=4, iterations = 1000, stop_early=True, radius_detection=10)
 rtt.planning()
 rtt.find_path()
 

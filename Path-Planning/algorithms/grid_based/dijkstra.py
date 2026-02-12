@@ -27,6 +27,7 @@ class dijikstra:
         heap = []
         #initialize Start Coord
         start_x, start_y = self.startCoord
+        plt.title("Dijikstra Algorithm")
         end_x, end_y = self.endCoord
         if(self.map[start_y][start_x] == 0 or self.map[end_y][end_x] == 0):
             sys.exit('Start or End Point in Obstacle')

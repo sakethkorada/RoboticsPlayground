@@ -43,7 +43,7 @@ class RRT:
         :param y_new: y coordinate of new point
         """
         x_new,y_new,z_new = coords
-        return min(self.node_list, key=lambda n: (n.x - x_new)**2 + (n.y - y_new)**2 + (n.z-y_new)**2)
+        return min(self.node_list, key=lambda n: (n.x - x_new)**2 + (n.y - y_new)**2 + (n.z-z_new)**2)
 
     def calculate_new_node_location(self, near_node_location, random_pt):
         """
@@ -207,7 +207,7 @@ endPt = (50,40,50)
 env = Environment3D(70,70,70)
 env.add_random_obstacles(20,3,10)
 
-rtt = RRT(startPt,endPt,env, expand_dist=4, iterations = 500, stop_early=False, radius_detection=10)
+rtt = RRT(startPt,endPt,env, expand_dist=6, iterations = 500, stop_early=True, radius_detection=6)
 rtt.env.setup_env(start_point=startPt,goal_point=endPt)
 rtt.planning()
 rtt.find_path()

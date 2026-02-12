@@ -44,7 +44,7 @@ class RRTStar3d:
         :param y_new: y coordinate of new point
         """
         x_new,y_new,z_new = coords
-        return min(self.node_list, key=lambda n: (n.x - x_new)**2 + (n.y - y_new)**2 + (n.z-y_new)**2)
+        return min(self.node_list, key=lambda n: (n.x - x_new)**2 + (n.y - y_new)**2 + (n.z-z_new)**2)
 
     def calculate_new_node_location(self, near_node_location, random_pt):
         """
@@ -180,7 +180,7 @@ class RRTStar3d:
         
         for _ in range(self.iterations):
             #find random point in environment
-            random_pt = env.generate_random_pt()
+            random_pt = self.env.generate_random_pt()
             #find nearest node to random point 
             nearest_node = self.find_nearest_node(random_pt)
             x_near, y_near,z_near = nearest_node.x, nearest_node.y,nearest_node.z
@@ -241,10 +241,10 @@ class RRTStar3d:
                             
                             
 
-                if(self.stop_early == True and self.calculate_dist_between_nodes(self.goalCoord,new_node_location) <= self.radiusDetection):
+                if(self.stop_early == True and self.calculate_dist_between_nodes(self.goal,new_node_location) <= self.radius_detection):
                     break
-
-                self.env.plotter.add_title(f"n={_}")
+                if hasattr(self.env, 'plotter'):
+                    self.env.plotter.add_title(f"n={_}")
                 self.env.update_view()
                 
                 
@@ -267,16 +267,17 @@ class RRTStar3d:
         return
 
 # Usage
-startPt = (30,30,30)
-endPt = (50,40,50)
+if __name__ == "__main__":
+    startPt = (30,30,30)
+    endPt = (50,40,50)
 
-env = Environment3D(70,70,70)
-env.add_random_obstacles(20,3,10)
+    env = Environment3D(70,70,70)
+    env.add_random_obstacles(20,3,10)
 
-rtt = RRTStar3d(startPt,endPt,env, expand_dist=4, iterations = 500, stop_early=False, radius_detection=10)
-rtt.env.setup_env(start_point=startPt,goal_point=endPt)
-rtt.planning()
-rtt.find_path()
+    rtt = RRTStar3d(startPt,endPt,env, expand_dist=5, iterations = 200, stop_early=True, radius_detection=6)
+    rtt.env.setup_env(start_point=startPt,goal_point=endPt)
+    rtt.planning()
+    rtt.find_path()
 
-while(True):
-    env.update_view()
+    while(True):
+        env.update_view()
